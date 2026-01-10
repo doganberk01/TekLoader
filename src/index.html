@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TekLoader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Başlık Çubuğu -->
+        <header class="title-bar">
+            <div class="title-left">
+                <img src="../assets/icons/icon.png" alt="Logo" class="app-logo" onerror="this.style.display='none'">
+                <h1 class="app-title">TekLoader</h1>
+            </div>
+            <div class="window-controls">
+                <button class="control-btn" id="btn-minimize">
+                    <span class="material-symbols-outlined">remove</span>
+                </button>
+                <button class="control-btn" id="btn-maximize">
+                    <span class="material-symbols-outlined">check_box_outline_blank</span>
+                </button>
+                <button class="control-btn close-btn" id="btn-close">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Ana İçerik -->
+        <main class="main-content">
+            <!-- Mod Seçimi -->
+            <div class="mode-switch-container">
+                <button class="mode-btn active" id="mode-url" title="URL ile İndir">
+                    <span class="material-symbols-outlined">link</span>
+                    <span>URL</span>
+                </button>
+                <button class="mode-btn" id="mode-search" title="YouTube'da Ara">
+                    <span class="material-symbols-outlined">search</span>
+                    <span>YouTube Ara</span>
+                </button>
+            </div>
+
+            <!-- URL Giriş Alanı -->
+            <div class="url-section">
+                <div class="url-input-wrapper">
+                    <input type="text" id="url-input" class="url-input" placeholder="Video URL yapıştır...">
+                    <button class="paste-btn" id="btn-paste" title="Yapıştır">
+                        <span class="material-symbols-outlined">content_paste</span>
+                    </button>
+                    <!-- Arama butonu (sadece arama modunda görünür) -->
+                    <button class="search-btn hidden" id="btn-search-trigger" title="Ara">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Arama Sonuçları -->
+            <div class="search-results hidden" id="search-results">
+                <!-- Sonuçlar buraya dinamik olarak eklenecek -->
+            </div>
+
+            <!-- Sağ Tık Menüsü -->
+            <div class="context-menu hidden" id="context-menu">
+                <button class="context-menu-item" id="context-paste">
+                    <span>Yapıştır</span>
+                    <span class="shortcut">Ctrl+V</span>
+                </button>
+            </div>
+
+            <!-- Video Önizleme + Seçenekler (Yan yana) -->
+            <div class="preview-options-row hidden" id="preview-options-row">
+                <!-- Sol: Video Önizleme -->
+                <div class="video-preview" id="video-preview">
+                    <div class="thumbnail-wrapper">
+                        <img src="" alt="Thumbnail" class="thumbnail" id="video-thumbnail">
+                        <span class="duration" id="video-duration">0:00</span>
+                    </div>
+                    <div class="video-info">
+                        <h2 class="video-title" id="video-title">Video Başlığı</h2>
+                        <p class="video-channel" id="video-channel">Kanal Adı</p>
+                        <div class="video-stats">
+                            <span class="stat">
+                                <span class="material-symbols-outlined">visibility</span>
+                                <span id="video-views">0</span>
+                            </span>
+                            <span class="stat">
+                                <span class="material-symbols-outlined">thumb_up</span>
+                                <span id="video-likes">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sağ: İndirme Seçenekleri -->
+                <div class="download-options" id="download-options">
+                    <!-- Format + Kalite yan yana -->
+                    <div class="options-top-row">
+                        <!-- Format Seçimi (alt alta) -->
+                        <div class="option-group format-group">
+                            <label class="option-label">Format</label>
+                            <div class="format-toggle-vertical">
+                                <button class="format-btn active" data-format="video" id="btn-video">
+                                    <span class="material-symbols-outlined">movie</span>
+                                    MP4
+                                </button>
+                                <button class="format-btn" data-format="audio" id="btn-audio">
+                                    <span class="material-symbols-outlined">headphones</span>
+                                    MP3
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sağ sütun: Kalite + Numara -->
+                        <div class="options-right-column">
+                            <!-- Kalite Seçimi -->
+                            <div class="option-group quality-group" id="quality-group">
+                                <label class="option-label">Kalite</label>
+                                <select class="quality-select" id="quality-select">
+                                    <option value="best">En İyi</option>
+                                    <option value="4320">8K (4320p)</option>
+                                    <option value="2160">4K (2160p)</option>
+                                    <option value="1440">2K (1440p)</option>
+                                    <option value="1080">1080p</option>
+                                    <option value="720">720p</option>
+                                    <option value="480">480p</option>
+                                    <option value="360">360p</option>
+                                </select>
+                            </div>
+                            <!-- Numaralı dosya seçeneği (kaliteden ayrı) -->
+                            <label class="checkbox-label playlist-options hidden" id="playlist-options">
+                                <input type="checkbox" id="use-numbers" checked>
+                                Numaralı dosya adı
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlist Video Seçimi (URL yapıştırılınca gösterilir) -->
+            <div class="playlist-selection hidden" id="playlist-selection">
+                <div class="playlist-selection-header">
+                    <div class="selection-info">
+                        <span id="selected-count">0</span> / <span id="selection-total">0</span> video seçili
+                    </div>
+                    <div class="selection-actions">
+                        <button class="selection-btn" id="btn-select-all">
+                            <span class="material-symbols-outlined">select_all</span>
+                            Tümünü Seç
+                        </button>
+                        <button class="selection-btn" id="btn-deselect-all">
+                            <span class="material-symbols-outlined">deselect</span>
+                            Tümünü Kaldır
+                        </button>
+                    </div>
+                </div>
+                <div class="playlist-selection-list" id="playlist-selection-list">
+                    <!-- Seçim checkboxları dinamik olarak eklenecek -->
+                </div>
+            </div>
+
+            <!-- Playlist Video Listesi (Gizli başta) -->
+            <div class="playlist-section hidden" id="playlist-section">
+                <!-- Playlist başlık bilgisi (indirme sırasında görünür) -->
+                <div class="playlist-header" id="playlist-header">
+                    <div class="playlist-header-info">
+                        <img src="" alt="Thumbnail" class="playlist-thumb" id="playlist-thumb">
+                        <div class="playlist-meta">
+                            <h3 class="playlist-title" id="playlist-title-display">Playlist Adı</h3>
+                            <p class="playlist-channel" id="playlist-channel-display">Kanal Adı</p>
+                            <p class="playlist-count" id="playlist-count-display">0 video</p>
+                        </div>
+                    </div>
+                    <div class="playlist-progress-summary" id="playlist-progress-summary">
+                        <span class="completed-count" id="completed-count">0</span> / <span class="total-count"
+                            id="total-count">0</span> tamamlandı
+                    </div>
+                </div>
+                <div class="playlist-videos" id="playlist-videos">
+                    <!-- Video öğeleri dinamik olarak eklenecek -->
+                </div>
+            </div>
+
+            <!-- İlerleme Durumu (Gizli başta) -->
+            <div class="progress-section hidden" id="progress-section">
+                <div class="progress-info">
+                    <div class="progress-text">
+                        <span class="progress-status" id="progress-status">İndiriliyor...</span>
+                        <span class="progress-filename" id="progress-filename">dosya.mp4</span>
+                    </div>
+                    <div class="progress-right">
+                        <span class="progress-percent" id="progress-percent">0%</span>
+                        <button class="cancel-btn" id="btn-cancel" title="İptal Et">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-bar"></div>
+                </div>
+                <div class="progress-details">
+                    <span id="progress-speed">0 MB/s</span>
+                    <span id="progress-eta">Hesaplanıyor...</span>
+                </div>
+            </div>
+
+            <!-- Yükleme Göstergesi -->
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <span>Video bilgisi alınıyor...</span>
+            </div>
+
+            <!-- Hata Mesajı -->
+            <div class="error-message hidden" id="error-message">
+                <span class="material-symbols-outlined">error</span>
+                <span id="error-text">Hata oluştu</span>
+            </div>
+
+            <!-- Başarı Mesajı -->
+            <div class="success-message hidden" id="success-message">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>İndirme tamamlandı!</span>
+                <button class="open-folder-btn" id="btn-open-folder">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    Klasörü Aç
+                </button>
+            </div>
+        </main>
+
+        <!-- Alt Bilgi -->
+        <footer class="footer">
+            <div class="folder-info">
+                <span class="material-symbols-outlined">folder_open</span>
+                <span class="folder-path" id="folder-path">C:/Users/Downloads</span>
+            </div>
+            <div class="footer-actions">
+                <button class="footer-btn" id="btn-change-folder">
+                    <span class="material-symbols-outlined">folder</span>
+                    <span>Klasör Değiştir</span>
+                </button>
+                <button class="footer-btn download-btn" id="btn-download" disabled>
+                    <span class="material-symbols-outlined">download</span>
+                    <span>İndir</span>
+                </button>
+                <button class="footer-btn settings-btn" id="btn-settings">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Ayarlar</span>
+                </button>
+            </div>
+        </footer>
+
+        <!-- Ayarlar Modal -->
+        <div class="modal-overlay hidden" id="settings-modal">
+            <div class="modal-content settings-modal-content">
+                <div class="modal-header">
+                    <h2><span class="material-symbols-outlined">settings</span> Ayarlar</h2>
+                    <button class="modal-close" id="btn-close-modal">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Tab Menüsü -->
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="general">
+                        <span class="material-symbols-outlined">tune</span>
+                        Genel
+                    </button>
+                    <button class="settings-tab" data-tab="history">
+                        <span class="material-symbols-outlined">history</span>
+                        Geçmiş
+                    </button>
+                    <button class="settings-tab" data-tab="about">
+                        <span class="material-symbols-outlined">info</span>
+                        Hakkında
+                    </button>
+                </div>
+
+                <!-- Tab İçerikleri -->
+                <div class="settings-content">
+                    <!-- Genel Tab -->
+                    <div class="settings-panel active" id="panel-general">
+                        <!-- Tema -->
+                        <div class="settings-group">
+                            <label class="settings-label">
+                                <span class="material-symbols-outlined">palette</span>
+                                Tema
+                            </label>
+                            <div class="theme-selector">
+                                <button class="theme-btn active" data-theme="dark">
+                                    <span class="material-symbols-outlined">dark_mode</span>
+                                    Koyu
+                                </button>
+                                <button class="theme-btn" data-theme="light">
+                                    <span class="material-symbols-outlined">light_mode</span>
+                                    Açık
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dil -->
+                        <div class="settings-group">
+                            <label class="settings-label">
+                                <span class="material-symbols-outlined">language</span>
+                                Dil
+                            </label>
+                            <div class="language-selector">
+                                <button class="lang-btn active" data-lang="tr">
+                                    Türkçe
+                                </button>
+                                <button class="lang-btn" data-lang="en">
+                                    English
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bildirimler -->
+                        <div class="settings-group">
+                            <label class="settings-label">
+                                <span class="material-symbols-outlined">notifications</span>
+                                Bildirimler
+                            </label>
+                            <label class="settings-toggle">
+                                <input type="checkbox" id="notifications-toggle" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">İndirme tamamlandığında bildir</span>
+                            </label>
+                        </div>
+
+                        <!-- Geçmiş Kaydet -->
+                        <div class="settings-group">
+                            <label class="settings-label">
+                                <span class="material-symbols-outlined">history</span>
+                                İndirme Geçmişi
+                            </label>
+                            <label class="settings-toggle">
+                                <input type="checkbox" id="history-toggle">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Geçmişi kaydet</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Geçmiş Tab -->
+                    <div class="settings-panel" id="panel-history">
+                        <div class="history-header">
+                            <span class="history-count">0 kayıt</span>
+                            <button class="clear-history-btn" id="btn-clear-history">
+                                <span class="material-symbols-outlined">delete</span>
+                                Geçmişi Temizle
+                            </button>
+                        </div>
+                        <div class="history-list" id="history-list">
+                            <div class="history-empty">
+                                <span class="material-symbols-outlined">history</span>
+                                <p>Henüz indirme geçmişi yok</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hakkında Tab -->
+                    <div class="settings-panel" id="panel-about">
+                        <div class="about-content">
+                            <img src="../assets/icons/icon.png" alt="Logo" class="about-logo">
+                            <h3>TekLoader</h3>
+                            <p class="version">Versiyon 1.0.0</p>
+                            <p class="description">Çoklu platform video ve müzik indirme uygulaması</p>
+                            <div class="features">
+                                <p>✓ YouTube, TikTok, Instagram, Facebook, Twitter/X</p>
+                                <p>✓ MP4 ve MP3 formatında indirme</p>
+                                <p>✓ Playlist desteği</p>
+                                <p>✓ Yüksek kalite seçenekleri (8K, 4K, 2K, 1080p)</p>
+                            </div>
+
+                            <!-- İndirme Motoru Güncelleme -->
+                            <div class="engine-update-section">
+                                <div class="engine-info">
+                                    <span class="engine-label">İndirme Motoru:</span>
+                                    <span class="engine-version" id="engine-version">Yükleniyor...</span>
+                                </div>
+                                <button class="update-engine-btn" id="btn-update-engine">
+                                    <span class="material-symbols-outlined">update</span>
+                                    Güncellemeyi Kontrol Et
+                                </button>
+                                <div class="update-status hidden" id="update-status">
+                                    <span class="material-symbols-outlined spinning">sync</span>
+                                    <span id="update-status-text">Kontrol ediliyor...</span>
+                                </div>
+                            </div>
+
+                            <p class="developer">Geliştirici: <strong>D.Berk</strong></p>
+                            <p class="copyright">© 2026 Tüm hakları saklıdır.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Özel Onay Modalı -->
+        <div class="modal-overlay hidden" id="confirm-modal">
+            <div class="confirm-modal-content">
+                <div class="confirm-icon">
+                    <span class="material-symbols-outlined">warning</span>
+                </div>
+                <h3 class="confirm-title" id="confirm-title">Onay</h3>
+                <p class="confirm-message" id="confirm-message">Bu işlemi yapmak istediğinize emin misiniz?</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-btn cancel" id="confirm-cancel">
+                        İptal
+                    </button>
+                    <button class="confirm-btn confirm" id="confirm-ok">
+                        Evet, Sil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

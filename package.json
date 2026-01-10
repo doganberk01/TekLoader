@@ -1,0 +1,64 @@
+{
+  "name": "tekloader",
+  "version": "1.0.0",
+  "description": "TekLoader - Video İndirici",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable",
+    "build:dir": "electron-builder --win --dir"
+  },
+  "author": "D.Berk",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "rcedit": "^5.0.2"
+  },
+  "build": {
+    "appId": "com.dberk.tekloader",
+    "productName": "TekLoader",
+    "executableName": "TekLoader",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icons/icon.ico",
+      "signAndEditExecutable": true
+    },
+    "extraResources": [
+      {
+        "from": "assets/bin",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "portable": {
+      "artifactName": "TekLoader-Portable.exe"
+    },
+    "asar": true,
+    "compression": "maximum",
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "TekLoader",
+      "license": "LICENSE.txt",
+      "installerIcon": "assets/icons/icon.ico",
+      "uninstallerIcon": "assets/icons/icon.ico",
+      "installerHeaderIcon": "assets/icons/icon.ico",
+      "deleteAppDataOnUninstall": true,
+      "runAfterFinish": true,
+      "installerLanguages": [
+        "tr",
+        "en"
+      ],
+      "language": 1055
+    }
+  }
+}

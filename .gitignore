@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+build-error.log
+build-output.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Binaries (users should download these)
+assets/bin/yt-dlp.exe
+assets/bin/ffmpeg.exe
+assets/bin/ffprobe.exe
+
+# Local development
+*.local
+
+# Cache
+.cache/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,36 @@
+TekLoader - Video Indirici
+Lisans Sozlesmesi
+
+Telif Hakki (c) 2026 D.Berk
+
+Bu yazilim MIT Lisansi altinda dagitilmaktadir.
+
+MIT LISANSI
+
+Isbu belge ile, bu yazilimin ve ilgili dokumantasyon dosyalarinin 
+("Yazilim") bir kopyasini edinen herhangi bir kisiye, Yazilimi 
+kisitlama olmaksizin kullanma, kopyalama, degistirme, birlestirme, 
+yayinlama, dagitma, alt lisanslama ve/veya satma haklari dahil 
+olmak uzere, Yazilimda islem yapma izni ucretsiz olarak verilmektedir.
+
+Bu Yazilim "OLDUGU GIBI" saglanmaktadir, herhangi bir garanti 
+olmaksizin, acik veya zimni, SATILABILIRLIK, BELIRLI BIR AMACA 
+UYGUNLUK ve IHLAL ETMEME garantileri dahil ancak bunlarla sinirli 
+olmamak uzere. Yazarlar veya telif hakki sahipleri, sozlesmeden, 
+haksiz fiilden veya baska bir sekilde, Yazilimla veya Yazilimin 
+kullanimi veya diger islemlerle baglantili olarak ortaya cikan 
+herhangi bir talep, hasar veya diger yukumluluklerden sorumlu 
+tutulamaz.
+
+---
+
+ONEMLI NOTLAR:
+
+1. Bu uygulama yalnizca kisisel kullanim icindir.
+2. Telif hakkiyla korunan iceriklerin izinsiz indirilmesi yasaktir.
+3. Kullanici, iceriklerin yasal kullanimindan kendisi sorumludur.
+4. Bu uygulama YouTube ile resmi bir baglanti icermemektedir.
+
+---
+
+Kuruluma devam ederek bu sozlesmeyi kabul etmis olursunuz.
