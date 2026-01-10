@@ -4,6 +4,9 @@ A modern **desktop application** for downloading videos and audio from **YouTube
 It uses **yt-dlp** and **FFmpeg** for high-quality downloads.  
 Built with **Electron** for a native desktop experience.
 
+[![Download](https://img.shields.io/badge/Download-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/doganberk01/TekLoader/releases/latest)
+[![Release](https://img.shields.io/github/v/release/doganberk01/TekLoader?style=for-the-badge)](https://github.com/doganberk01/TekLoader/releases)
+
 ---
 
 ## 📝 Overview
