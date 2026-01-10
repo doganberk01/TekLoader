@@ -1,36 +1,21 @@
-TekLoader - Video Indirici
-Lisans Sozlesmesi
+MIT License
 
-Telif Hakki (c) 2026 D.Berk
+Copyright (c) 2026 Doğan Berk
 
-Bu yazilim MIT Lisansi altinda dagitilmaktadir.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-MIT LISANSI
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Isbu belge ile, bu yazilimin ve ilgili dokumantasyon dosyalarinin 
-("Yazilim") bir kopyasini edinen herhangi bir kisiye, Yazilimi 
-kisitlama olmaksizin kullanma, kopyalama, degistirme, birlestirme, 
-yayinlama, dagitma, alt lisanslama ve/veya satma haklari dahil 
-olmak uzere, Yazilimda islem yapma izni ucretsiz olarak verilmektedir.
-
-Bu Yazilim "OLDUGU GIBI" saglanmaktadir, herhangi bir garanti 
-olmaksizin, acik veya zimni, SATILABILIRLIK, BELIRLI BIR AMACA 
-UYGUNLUK ve IHLAL ETMEME garantileri dahil ancak bunlarla sinirli 
-olmamak uzere. Yazarlar veya telif hakki sahipleri, sozlesmeden, 
-haksiz fiilden veya baska bir sekilde, Yazilimla veya Yazilimin 
-kullanimi veya diger islemlerle baglantili olarak ortaya cikan 
-herhangi bir talep, hasar veya diger yukumluluklerden sorumlu 
-tutulamaz.
-
----
-
-ONEMLI NOTLAR:
-
-1. Bu uygulama yalnizca kisisel kullanim icindir.
-2. Telif hakkiyla korunan iceriklerin izinsiz indirilmesi yasaktir.
-3. Kullanici, iceriklerin yasal kullanimindan kendisi sorumludur.
-4. Bu uygulama YouTube ile resmi bir baglanti icermemektedir.
-
----
-
-Kuruluma devam ederek bu sozlesmeyi kabul etmis olursunuz.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
