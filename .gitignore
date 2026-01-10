@@ -4,9 +4,6 @@ node_modules/
 # Build output
 dist/
 
-# Project notes (private)
-project-notes.md
-
 # Logs
 *.log
 build-error.log
