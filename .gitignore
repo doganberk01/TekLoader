@@ -14,12 +14,15 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# IDE
+# IDE & Local Notes
 .vscode/
 .idea/
+project-notes.md
+GEMINI.md
 
 # Binaries (users should download these)
 assets/bin/yt-dlp.exe
+assets/bin/yt-dlp.exe.old
 assets/bin/ffmpeg.exe
 assets/bin/ffprobe.exe
 

@@ -187,6 +187,19 @@ export async function loadEngineVersion() {
     }
 }
 
+// Başlangıçta arka planda sessizce motor güncellemesini kontrol et
+export async function autoUpdateEngine() {
+    try {
+        const result = await window.electronAPI.updateEngine();
+        if (result?.success && result?.updated) {
+            await loadEngineVersion();
+            console.log('İndirme motoru arka planda otomatik güncellendi ✓');
+        }
+    } catch (err) {
+        // Arka plan kontrolünde hata olursa kullanıcıyı rahatsız etme
+    }
+}
+
 // Motoru güncelle
 export async function updateEngine() {
     elements.btnUpdateEngine.classList.add(CSS.HIDDEN);

@@ -6,7 +6,7 @@ import { elements } from './modules/elements.js';
 import { CSS } from './modules/constants.js';
 import { setupEventListeners } from './modules/event-handlers.js';
 import { handleProgress } from './modules/download-manager.js';
-import { applyTheme, loadEngineVersion } from './modules/settings-manager.js';
+import { applyTheme, loadEngineVersion, autoUpdateEngine } from './modules/settings-manager.js';
 import { translations } from './modules/translations.js';
 
 // ===== DİL DESTEĞİ =====
@@ -99,7 +99,7 @@ window.applyLanguage = function () {
 
     // Hakkında
     const versionText = document.querySelector('.about-content .version');
-    if (versionText) versionText.textContent = lang.version + ' 1.0.0';
+    if (versionText) versionText.textContent = lang.version + ' ' + (window.appVersion || '1.1.0');
 
     const descText = document.querySelector('.about-content .description');
     if (descText) descText.textContent = lang.description;
@@ -148,6 +148,18 @@ window.applyLanguage = function () {
 
 // ===== BAŞLATMA =====
 async function init() {
+    // Uygulama versiyonunu package.json'dan dinamik al
+    try {
+        window.appVersion = await window.electronAPI.getAppVersion();
+        const versionText = document.querySelector('.about-content .version');
+        if (versionText && window.appVersion) {
+            const lang = window.translations?.[window.currentLanguage];
+            versionText.textContent = (lang?.version || 'Versiyon') + ' ' + window.appVersion;
+        }
+    } catch (e) {
+        window.appVersion = '1.1.0';
+    }
+
     // İndirme klasörünü al
     state.downloadPath = await window.electronAPI.getDownloadsPath();
     elements.folderPath.textContent = state.downloadPath;
@@ -175,7 +187,12 @@ async function init() {
     }
 
     // İndirme motoru versiyonunu yükle
-    loadEngineVersion();
+    await loadEngineVersion();
+
+    // Uygulama açıldıktan 2 saniye sonra arka planda sessizce yt-dlp güncellemesini kontrol et
+    setTimeout(() => {
+        autoUpdateEngine();
+    }, 2000);
 
     console.log('TekLoader modüler yapı başlatıldı ✓');
 }

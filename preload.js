@@ -36,7 +36,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Bildirimler
     sendNotification: (title, body) => ipcRenderer.invoke('send-notification', { title, body }),
 
-    // İndirme Motoru (yt-dlp)
+    // Uygulama ve İndirme Motoru Versiyonu
+    getAppVersion: () => ipcRenderer.invoke('get-app-version'),
     getEngineVersion: () => ipcRenderer.invoke('get-engine-version'),
     updateEngine: () => ipcRenderer.invoke('update-engine')
 });

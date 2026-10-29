@@ -221,6 +221,11 @@ ipcMain.handle('send-notification', (event, { title, body }) => {
     return true;
 });
 
+// Uygulama versiyonunu al (package.json'dan dinamik)
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
+
 // İndirme motoru versiyonu al
 ipcMain.handle('get-engine-version', async () => {
     return new Promise((resolve) => {
@@ -242,11 +247,22 @@ ipcMain.handle('get-engine-version', async () => {
     });
 });
 
+// Aktif motor güncelleme durumu
+let isUpdatingEngine = false;
+
 // İndirme motorunu güncelle
 ipcMain.handle('update-engine', async () => {
+    if (isUpdatingEngine) {
+        return { success: false, message: 'Güncelleme zaten devam ediyor' };
+    }
+    if (downloadProcess) {
+        return { success: false, message: 'İndirme devam ederken güncellenemez' };
+    }
+
+    isUpdatingEngine = true;
     return new Promise((resolve) => {
         const ytdlp = getBinPath('yt-dlp.exe');
-        const process = spawn(ytdlp, ['-U']);
+        const process = spawn(ytdlp, ['-U', '--no-check-certificate']);
         let output = '';
         let error = '';
 
@@ -259,6 +275,7 @@ ipcMain.handle('update-engine', async () => {
         });
 
         process.on('close', (code) => {
+            isUpdatingEngine = false;
             const fullOutput = output + error;
 
             if (code === 0) {
@@ -274,6 +291,7 @@ ipcMain.handle('update-engine', async () => {
         });
 
         process.on('error', (err) => {
+            isUpdatingEngine = false;
             resolve({ success: false, message: err.message });
         });
     });
@@ -299,7 +317,35 @@ function getBinPath(name) {
     const basePath = isDev
         ? path.join(__dirname, 'assets', 'bin')
         : path.join(process.resourcesPath, 'bin');
-    return path.join(basePath, name);
+    const bundledPath = path.join(basePath, name);
+
+    // Paketlenmiş uygulamada Program Files yazma izni sorununu aşmak için
+    // yt-dlp.exe'yi userData/bin klasöründen çalıştır ve orada güncelle
+    if (!isDev && name === 'yt-dlp.exe') {
+        try {
+            const userBinDir = path.join(getUserDataPath(), 'bin');
+            const userYtdlpPath = path.join(userBinDir, name);
+
+            if (!fs.existsSync(userBinDir)) {
+                fs.mkdirSync(userBinDir, { recursive: true });
+            }
+
+            if (!fs.existsSync(userYtdlpPath)) {
+                fs.copyFileSync(bundledPath, userYtdlpPath);
+            } else if (fs.existsSync(bundledPath)) {
+                const bundledStat = fs.statSync(bundledPath);
+                const userStat = fs.statSync(userYtdlpPath);
+                if (bundledStat.mtimeMs > userStat.mtimeMs) {
+                    fs.copyFileSync(bundledPath, userYtdlpPath);
+                }
+            }
+            return userYtdlpPath;
+        } catch (err) {
+            console.error('userData yt-dlp kopyalama hatası:', err);
+        }
+    }
+
+    return bundledPath;
 }
 
 // URL'nin playlist olup olmadığını kontrol et
@@ -474,12 +520,19 @@ ipcMain.handle('download-video', async (event, options) => {
 
         if (isPlaylist) {
             // Playlist: klasör oluştur
+            const playlistDir = path.join(options.outputPath, options.playlistName || 'Playlist');
+            if (!fs.existsSync(playlistDir)) {
+                fs.mkdirSync(playlistDir, { recursive: true });
+            }
             if (useNumbers) {
-                outputTemplate = path.join(options.outputPath, options.playlistName || 'Playlist', '%(playlist_index)s - %(title)s.%(ext)s');
+                outputTemplate = path.join(playlistDir, '%(playlist_index)s - %(title)s.%(ext)s');
             } else {
-                outputTemplate = path.join(options.outputPath, options.playlistName || 'Playlist', '%(title)s.%(ext)s');
+                outputTemplate = path.join(playlistDir, '%(title)s.%(ext)s');
             }
         } else {
+            if (!fs.existsSync(options.outputPath)) {
+                fs.mkdirSync(options.outputPath, { recursive: true });
+            }
             outputTemplate = path.join(options.outputPath, options.filename);
         }
 
@@ -489,13 +542,18 @@ ipcMain.handle('download-video', async (event, options) => {
             '--newline',
             '--progress',
             '--no-warnings',
-            '--ignore-errors',
+            '--no-check-certificate',
             '--concurrent-fragments', '4'  // Performans: 4 paralel segment indirme
         ];
 
-        // Seçili playlist öğeleri
-        if (options.playlistItems) {
-            args.push('--playlist-items', options.playlistItems);
+        if (isPlaylist) {
+            args.push('--ignore-errors');
+            // Seçili playlist öğeleri
+            if (options.playlistItems) {
+                args.push('--playlist-items', options.playlistItems);
+            }
+        } else {
+            args.push('--no-playlist');
         }
 
         // MP3 Metadata ve Altyazı
@@ -523,6 +581,7 @@ ipcMain.handle('download-video', async (event, options) => {
         downloadProcess = spawn(ytdlp, args);
         downloadCancelled = false;
         let currentVideo = '';
+        let errorOutput = '';
 
         downloadProcess.stdout.on('data', (data) => {
             const line = data.toString();
@@ -539,20 +598,23 @@ ipcMain.handle('download-video', async (event, options) => {
         });
 
         downloadProcess.stderr.on('data', (data) => {
-            console.error('yt-dlp error:', data.toString());
+            const errStr = data.toString();
+            errorOutput += errStr;
+            console.error('yt-dlp error:', errStr);
         });
 
         downloadProcess.on('close', (code) => {
             downloadProcess = null;
+            const fileCreated = !isPlaylist && fs.existsSync(outputTemplate) && fs.statSync(outputTemplate).size > 0;
             if (downloadCancelled) {
                 reject(new Error('İndirme iptal edildi'));
-            } else if (code === 0) {
+            } else if (code === 0 || fileCreated) {
                 const resultPath = isPlaylist
                     ? path.join(options.outputPath, options.playlistName || 'Playlist')
                     : outputTemplate;
                 resolve({ success: true, filePath: resultPath });
             } else {
-                reject(new Error('İndirme başarısız oldu'));
+                reject(new Error(errorOutput.trim() || 'İndirme başarısız oldu'));
             }
         });
     });
@@ -577,6 +639,7 @@ ipcMain.handle('download-single-video', async (event, options) => {
             '--newline',
             '--progress',
             '--no-warnings',
+            '--no-check-certificate',
             '--no-playlist', // Tek video indir
             '--concurrent-fragments', '4'  // Performans: 4 paralel segment indirme
         ];
@@ -604,6 +667,7 @@ ipcMain.handle('download-single-video', async (event, options) => {
 
         downloadProcess = spawn(ytdlp, args);
         downloadCancelled = false;
+        let errorOutput = '';
 
         downloadProcess.stdout.on('data', (data) => {
             const line = data.toString();
@@ -615,17 +679,20 @@ ipcMain.handle('download-single-video', async (event, options) => {
         });
 
         downloadProcess.stderr.on('data', (data) => {
-            console.error('yt-dlp error:', data.toString());
+            const errStr = data.toString();
+            errorOutput += errStr;
+            console.error('yt-dlp error:', errStr);
         });
 
         downloadProcess.on('close', (code) => {
             downloadProcess = null;
+            const fileCreated = fs.existsSync(outputTemplate) && fs.statSync(outputTemplate).size > 0;
             if (downloadCancelled) {
                 reject(new Error('İndirme iptal edildi'));
-            } else if (code === 0) {
+            } else if (code === 0 || fileCreated) {
                 resolve({ success: true, filePath: outputTemplate, videoIndex: options.videoIndex });
             } else {
-                reject(new Error('Video indirilemedi'));
+                reject(new Error(errorOutput.trim() || 'Video indirilemedi'));
             }
         });
     });

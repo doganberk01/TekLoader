@@ -44,11 +44,24 @@ export function sanitizeFilename(name) {
 
 // Kullanıcı dostu hata mesajı
 export function getUserFriendlyError(error) {
-    const errorStr = error?.message || error?.toString() || '';
+    let errorStr = error?.message || error?.toString() || '';
+
+    // IPC hatalarını en başta temizle ('download-video' içindeki 'download' kelimesinin yanıltmaması için)
+    if (errorStr.includes('Error invoking remote method')) {
+        const match = errorStr.match(/Error:\s*(.+)$/s);
+        if (match) {
+            errorStr = match[1].trim();
+        }
+    }
 
     // İptal durumu
     if (errorStr.includes('iptal edildi') || errorStr.includes('cancelled')) {
         return 'İndirme iptal edildi';
+    }
+
+    // 403 Forbidden (eski yt-dlp sürümü veya YouTube engeli)
+    if (errorStr.includes('403') || errorStr.includes('Forbidden')) {
+        return 'İndirme reddedildi (403). Lütfen Ayarlar > Hakkında bölümünden İndirme Motorunu güncelleyin.';
     }
 
     // Ağ hataları
@@ -77,17 +90,8 @@ export function getUserFriendlyError(error) {
     }
 
     // Genel indirme hatası
-    if (errorStr.includes('download') || errorStr.includes('Download')) {
+    if (errorStr.includes('download') || errorStr.includes('Download') || errorStr.includes('İndirme başarısız')) {
         return 'İndirme başarısız oldu';
-    }
-
-    // IPC hatalarını temizle
-    if (errorStr.includes('Error invoking remote method')) {
-        const match = errorStr.match(/Error: (.+?)(?:\r?\n|$)/);
-        if (match) {
-            return getUserFriendlyError({ message: match[1] });
-        }
-        return 'İşlem başarısız oldu';
     }
 
     // Varsayılan
